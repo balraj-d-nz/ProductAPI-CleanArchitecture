@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using ProductAPI.Application.Interfaces;
 using ProductAPI.Domain.Entities;
 
 namespace ProductAPI.Infrastructure.Persistence
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : DbContext, IApplicationDbContext
     {
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
-            :base(options)
-        { 
+            : base(options)
+        {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
