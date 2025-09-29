@@ -2,8 +2,9 @@ using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProductAPI.Application.Interfaces;
+using ProductAPI.Application.Services;
 using ProductAPI.Infrastructure.Persistence;
-using ProductAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +21,15 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 // Add DbContext
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
+builder.Services.AddScoped<IApplicationDbContext>(provider =>
+    provider.GetRequiredService<DatabaseContext>());
+
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -45,29 +52,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-
-//Previous way of using GlobalException Hanlder
-//app.UseExceptionHandler(errorApp =>
-//{
-//    errorApp.Run(async context =>
-//    {
-//        var exceptionHandlerPathFeature =
-//            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-
-//        var problem = new ProblemDetails
-//        {
-//            Status = StatusCodes.Status500InternalServerError,
-//            Title = "An unexpected error occurred",
-//            Detail = exceptionHandlerPathFeature?.Error.Message // (optional, for dev env)
-//        };
-
-//        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-//        context.Response.ContentType = "application/json";
-//        await context.Response.WriteAsJsonAsync(problem);
-//    });
-//});
 
 app.UseHttpsRedirection();
 

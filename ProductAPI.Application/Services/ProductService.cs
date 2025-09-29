@@ -5,34 +5,95 @@ using System.Text;
 using System.Threading.Tasks;
 using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using ProductAPI.Domain.Exceptions;
+using ProductAPI.Domain.Entities;
 
 namespace ProductAPI.Application.Services
 {
     public class ProductService : IProductService
     {
-        public Task<int> CreateProductAsync(ProductCreateDto productDto)
+        private readonly IApplicationDbContext _context;
+        public ProductService(IApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+        public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto productDto)
+        {
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                CreatedDate = DateTime.UtcNow,
+            };
+
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync(new CancellationToken());
+
+            return new ProductResponseDto
+            {
+                Id = product.Id,
+                Description = product.Description,
+                Name = product.Name,
+                Price = product.Price
+            };
         }
 
-        public Task DeleteProductAsync(int id)
+        public async Task DeleteProductAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.FirstOrDefaultAsync(p =>  p.Id == id);
+            if (product == null)
+            {
+                throw new NotFoundException(id);
+            }
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync(new CancellationToken());
         }
 
-        public Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync()
+        public async Task<List<ProductResponseDto>> GetAllProductsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Products.AsNoTracking().Select(p => new ProductResponseDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description
+            }).ToListAsync();
         }
 
-        public Task<ProductResponseDto> GetProductByIdAsync()
+        public async Task<ProductResponseDto> GetProductByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                throw new NotFoundException(id);
+            }
+            return new ProductResponseDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price
+            };
+
         }
 
-        public Task UpdateProductAsync(int id, ProductUpdateDto productDto)
+        public async Task UpdateProductAsync(Guid id, ProductUpdateDto productDto)
         {
-            throw new NotImplementedException();
+
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                throw new NotFoundException(id);
+            }
+
+            product.Name = productDto.Name;
+            product.Description = productDto.Description;
+            product.Price = productDto.Price;
+
+            await _context.SaveChangesAsync(new CancellationToken());
         }
     }
 }

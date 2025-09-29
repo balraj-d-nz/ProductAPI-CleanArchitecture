@@ -9,42 +9,36 @@ using ProductAPI.Infrastructure.Persistence;
 using System.Net;
 using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Common.Errors;
+using ProductAPI.Application.Interfaces;
 
 namespace ProductAPI.Controllers
 {
+    /// <summary>
+    /// API endpoints for managing products.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly DatabaseContext _context;
-        private readonly ILogger<ProductController> _logger;
-        public ProductController(DatabaseContext context, ILogger<ProductController> logger)
+        private readonly IProductService _productService;
+        /// <summary>
+        /// Initializes a new instance of the ProductController class.
+        /// </summary>
+        /// <param name="productService">The product service.</param>
+        public ProductController(IProductService productService)
         {
-            _context = context;
-            _logger = logger;
+            _productService = productService;
         }
         /// <summary>
         /// Gets all products.
         /// </summary>
         /// <returns>A list of products if any exist.</returns>
-        /// <response code="200">Returns the list of products</response>
-        /// <response code="404">If no products are found</response>
-        /// <response code="400">If an unexpected error occurs</response>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductResponseDto>>> Get()
+        [ProducesResponseType(typeof(List<ProductResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<List<ProductResponseDto>>> Get()
         {
-            var products = await _context.Products.ToListAsync();
-            if (products.Any())
-            {
-                var productResponseDto = products.Select(p => new ProductResponseDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                });
-                return Ok(productResponseDto);
-            }
-            return NotFound(new ApiError { Code = HttpStatusCode.NotFound.ToString(), Message = "Could not find any products" });
+            return Ok(await _productService.GetAllProductsAsync());
         }
 
         /// <summary>
@@ -52,69 +46,42 @@ namespace ProductAPI.Controllers
         /// </summary>
         /// <param name="id">The product Id.</param>
         /// <returns>The requested product.</returns>
-        /// <response code="200">Returns a product</response>
-        /// <response code="404">If no product is found</response>
-        /// <response code="400">If an unexpected error occurs</response>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product?>> Get(Guid id)
+        [ProducesResponseType(typeof(ProductResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ProductResponseDto?>> Get(Guid id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound(new ApiError { Code = HttpStatusCode.NotFound.ToString(), Message = $"Could not find product with Id {id}" });
-            }
-            return Ok(product);
+            return Ok(await _productService.GetProductByIdAsync(id));
         }
 
         /// <summary>
         /// Creates a new product.
         /// </summary>
-        /// <param name="product">The product to create.</param>
+        /// <param name="productDto">The product to create.</param>
         /// <returns>The newly created product.</returns>
-        /// <response code="201">Successfully created a product</response>
-        /// <response code="400">If the product is invalid or an error occurs</response>
         [HttpPost]
-        public async Task<ActionResult> Post(Product product)
+        [ProducesResponseType(typeof(ProductResponseDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> Post(ProductCreateDto productDto)
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid product data: {ModelState}", ModelState);
-                return BadRequest(new ApiError { Code = HttpStatusCode.BadRequest.ToString(), Message = "Invalid product data", Details = ModelState.ToString() });
-            }
-
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
+            var newProduct = await _productService.CreateProductAsync(productDto);
+            return CreatedAtAction(nameof(Get), new { id = newProduct.Id }, newProduct);
         }
 
         /// <summary>
         /// Updates a product.
         /// </summary>
         /// <param name="id">The Id of the product to update.</param>
-        /// <param name="product">The updated Product object.</param>
+        /// <param name="productDto">The updated Product object.</param>
         /// <returns>No content if successful</returns>
-        /// <response code="204">If product is successfully updated</response>
-        /// <response code="400">If an unexpected error occurs or the Id of the product to update does not match the Id we are looking for</response>
-        /// <response code="404">If product to update is not found</response>
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(Guid id, Product product)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Put(Guid id, ProductUpdateDto productDto)
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid product data: {ModelState}", ModelState);
-                return BadRequest(new ApiError { Code = HttpStatusCode.BadRequest.ToString(), Message = "Invalid product data", Details = ModelState.ToString() });
-            }
-
-            if (id != product.Id)
-            {
-                return BadRequest(new ApiError { Code = HttpStatusCode.BadRequest.ToString(), Message = $"Id ({id}) does not match Product Object Id ({product.Id})" });
-            }
-            if (await _context.Products.FindAsync(id) == null)
-            {
-                return NotFound(new ApiError { Code = HttpStatusCode.NotFound.ToString(), Message = $"Could not find product: {id}" });
-            }
-            _context.Entry(product).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await _productService.UpdateProductAsync(id, productDto);
             return NoContent();
         }
 
@@ -122,26 +89,35 @@ namespace ProductAPI.Controllers
         /// Partially updates a product.
         /// </summary>
         /// <param name="id">The Id of the product to update.</param>
-        /// <param name="patchProduct">The updated Product object.</param>
+        /// <param name="patchDoc">The updated Product object.</param>
         /// <returns>No content if successful.</returns>
-        /// <response code="204">If product is successfully updated</response>
-        /// <response code="400">If an unexpected error occurs or the modelstate is not valid</response>
-        /// <response code="404">If product to update is not found</response>
         [HttpPatch("{id}")]
-        public async Task<ActionResult> Patch(Guid id, JsonPatchDocument<Product> patchProduct)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Patch(Guid id, JsonPatchDocument<ProductUpdateDto> patchDoc)
         {
-            var findProduct = await _context.Products.FindAsync(id);
-            if (findProduct == null)
-            {
-                return NotFound(new ApiError { Code = HttpStatusCode.NotFound.ToString(), Message = $"Could not find product: {id}" });
-            }
-            patchProduct.ApplyTo(findProduct);
-            if (!TryValidateModel(findProduct))
-            {
-                return BadRequest(new ApiError { Code = HttpStatusCode.BadRequest.ToString(), Message = $"ModelState is not valid during patch action. ModelState: {ModelState.ToString()}" });
+            // 1. Get the original data as a DTO
+            var productToUpdate = await _productService.GetProductByIdAsync(id);
 
+            var productDto = new ProductUpdateDto
+            {
+                Name = productToUpdate.Name,
+                Description = productToUpdate.Description,
+                Price = productToUpdate.Price
+            };
+
+            // 2. Apply the patch to the DTO (without ModelState)
+            patchDoc.ApplyTo(productDto);
+
+            // 3. Manually re-validate the DTO after the patch is applied
+            if (!TryValidateModel(productDto))
+            {
+                return ValidationProblem(ModelState);
             }
-            await _context.SaveChangesAsync();
+
+            // 4. Send the fully updated DTO to the service to save
+            await _productService.UpdateProductAsync(id, productDto);
             return NoContent();
         }
 
@@ -150,20 +126,14 @@ namespace ProductAPI.Controllers
         /// </summary>
         /// <param name="id">The Id of the product to delete.</param>
         /// <returns>No content if successful.</returns>
-        /// <response code="204">If product is successfully deleted</response>
-        /// <response code="400">If an unexpected error occurs</response>
-        /// <response code="404">If product to delete is not found</response>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var findProduct = await _context.Products.FindAsync(id);
-            if (findProduct != null)
-            {
-                _context.Remove(findProduct);
-                await _context.SaveChangesAsync();
-                return NoContent();
-            }
-            return NotFound(new ApiError { Code = HttpStatusCode.NotFound.ToString(), Message = $"Could not find product to delete: {id}" });
+            await _productService.DeleteProductAsync(id);
+            return NoContent();
         }
     }
 }
