@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI", "ProductAPI\ProductAPI.csproj", "{2D063AC7-7950-4B0F-9FBB-2F45419A1A9F}"
 EndProject
@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Domain", "Produc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Application", "ProductAPI.Application\ProductAPI.Application.csproj", "{EC4A1842-0B94-4C1C-8714-8F2E9D6B71A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Infrastucture", "ProductAPI.Infrastucture\ProductAPI.Infrastucture.csproj", "{576D0DA0-7475-407D-B868-1B4BBF7B655D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Infrastructure", "ProductAPI.Infrastucture\ProductAPI.Infrastructure.csproj", "{576D0DA0-7475-407D-B868-1B4BBF7B655D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
