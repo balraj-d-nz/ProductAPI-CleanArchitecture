@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
+using ProductAPI.Filters;
 using ProductAPI.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +20,14 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
     c.IncludeXmlComments(xmlPath);
+    c.OperationFilter<JsonPatchDocumentOperationFilter>();
 });
 // Add DbContext
 builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
+
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<DatabaseContext>());
 
