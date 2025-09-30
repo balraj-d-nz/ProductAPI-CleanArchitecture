@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
-using ProductAPI.Filters;
+using ProductAPI.Swagger.Filters;
 using ProductAPI.Infrastructure.Persistence;
 using Swashbuckle.AspNetCore.Filters;
 
