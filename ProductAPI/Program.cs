@@ -6,6 +6,7 @@ using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
 using ProductAPI.Filters;
 using ProductAPI.Infrastructure.Persistence;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 builder.Services.AddSwaggerGen(c =>
 {
     // Locate the XML file created by <GenerateDocumentationFile>
@@ -21,6 +23,7 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
     c.IncludeXmlComments(xmlPath);
     c.OperationFilter<JsonPatchDocumentOperationFilter>();
+    c.ExampleFilters();
 });
 // Add DbContext
 builder.Services.AddScoped<IProductService, ProductService>();
