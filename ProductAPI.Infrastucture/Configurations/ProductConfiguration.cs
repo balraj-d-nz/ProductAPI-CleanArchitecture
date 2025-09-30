@@ -19,7 +19,7 @@ namespace ProductAPI.Infrastructure.Configurations
             //Configure Name Property Required and Max Length
             builder.Property(p => p.Name)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(50);
 
 
             //Configure Description Property Max Length
