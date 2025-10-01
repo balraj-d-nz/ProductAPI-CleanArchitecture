@@ -8,41 +8,31 @@ using ProductAPI.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Domain.Exceptions;
 using ProductAPI.Domain.Entities;
+using AutoMapper;
 
 namespace ProductAPI.Application.Services
 {
     public class ProductService : IProductService
     {
         private readonly IApplicationDbContext _context;
-        public ProductService(IApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public ProductService(IApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<ProductResponseDto> CreateProductAsync(ProductCreateDto productDto)
         {
-            var product = new Product
-            {
-                Name = productDto.Name,
-                Description = productDto.Description,
-                Price = productDto.Price,
-                CreatedDate = DateTime.UtcNow,
-            };
-
+            var product = _mapper.Map<Product>(productDto);
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync(new CancellationToken());
+            return _mapper.Map<ProductResponseDto>(product);
 
-            return new ProductResponseDto
-            {
-                Id = product.Id,
-                Description = product.Description,
-                Name = product.Name,
-                Price = product.Price
-            };
         }
 
         public async Task DeleteProductAsync(Guid id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p =>  p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 throw new NotFoundException(id);
@@ -53,13 +43,8 @@ namespace ProductAPI.Application.Services
 
         public async Task<List<ProductResponseDto>> GetAllProductsAsync()
         {
-            return await _context.Products.AsNoTracking().Select(p => new ProductResponseDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Description = p.Description
-            }).ToListAsync();
+            var products = await _context.Products.AsNoTracking().ToListAsync();
+            return _mapper.Map<List<ProductResponseDto>>(products);
         }
 
         public async Task<ProductResponseDto> GetProductByIdAsync(Guid id)
@@ -69,19 +54,21 @@ namespace ProductAPI.Application.Services
             {
                 throw new NotFoundException(id);
             }
-            return new ProductResponseDto
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price
-            };
+            return _mapper.Map<ProductResponseDto>(product);
+        }
 
+        public async Task<ProductUpdateDto> GetProductForUpdateAsync(Guid id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if(product == null)
+            {
+                throw new NotFoundException(id);
+            }
+            return _mapper.Map<ProductUpdateDto>(product);
         }
 
         public async Task UpdateProductAsync(Guid id, ProductUpdateDto productDto)
         {
-
             var product = await _context.Products.FindAsync(id);
 
             if (product == null)
@@ -89,10 +76,7 @@ namespace ProductAPI.Application.Services
                 throw new NotFoundException(id);
             }
 
-            product.Name = productDto.Name;
-            product.Description = productDto.Description;
-            product.Price = productDto.Price;
-
+            _mapper.Map(productDto,product);
             await _context.SaveChangesAsync(new CancellationToken());
         }
     }

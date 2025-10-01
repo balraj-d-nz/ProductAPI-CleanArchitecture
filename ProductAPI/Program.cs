@@ -1,11 +1,15 @@
 using System;
 using System.Reflection;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
-using ProductAPI.Swagger.Filters;
+using ProductAPI.Domain.Entities;
 using ProductAPI.Infrastructure.Persistence;
+using ProductAPI.Swagger.Filters;
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +37,14 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<DatabaseContext>());
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.CreateMap<ProductCreateDto, Product>();
+    cfg.CreateMap<Product, ProductResponseDto>();
+    cfg.CreateMap<ProductUpdateDto, Product>().ReverseMap();
+
+});
 
 var app = builder.Build();
 

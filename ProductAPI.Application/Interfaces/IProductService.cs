@@ -13,6 +13,7 @@ namespace ProductAPI.Application.Interfaces
         Task<List<ProductResponseDto>> GetAllProductsAsync();
         Task<ProductResponseDto> GetProductByIdAsync(Guid id);
         Task<ProductResponseDto> CreateProductAsync(ProductCreateDto productDto);
+        Task<ProductUpdateDto> GetProductForUpdateAsync(Guid id);
         Task UpdateProductAsync(Guid id, ProductUpdateDto productDto);
         Task DeleteProductAsync(Guid id);
 
