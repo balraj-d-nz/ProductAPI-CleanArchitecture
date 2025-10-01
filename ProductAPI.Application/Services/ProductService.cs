@@ -25,7 +25,7 @@ namespace ProductAPI.Application.Services
         {
             var product = _mapper.Map<Product>(productDto);
             await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync(new CancellationToken());
+            await _context.SaveChangesAsync();
             return _mapper.Map<ProductResponseDto>(product);
 
         }
@@ -38,7 +38,7 @@ namespace ProductAPI.Application.Services
                 throw new NotFoundException(id);
             }
             _context.Products.Remove(product);
-            await _context.SaveChangesAsync(new CancellationToken());
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<ProductResponseDto>> GetAllProductsAsync()
@@ -57,14 +57,16 @@ namespace ProductAPI.Application.Services
             return _mapper.Map<ProductResponseDto>(product);
         }
 
-        public async Task<ProductUpdateDto> GetProductForUpdateAsync(Guid id)
+        public async Task PatchProductAsync(Guid id, ProductPatchDto productDto)
         {
             var product = await _context.Products.FindAsync(id);
-            if(product == null)
+            if (product == null)
             {
                 throw new NotFoundException(id);
             }
-            return _mapper.Map<ProductUpdateDto>(product);
+
+            _mapper.Map(productDto, product);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateProductAsync(Guid id, ProductUpdateDto productDto)
@@ -76,8 +78,8 @@ namespace ProductAPI.Application.Services
                 throw new NotFoundException(id);
             }
 
-            _mapper.Map(productDto,product);
-            await _context.SaveChangesAsync(new CancellationToken());
+            _mapper.Map(productDto, product);
+            await _context.SaveChangesAsync();
         }
     }
 }

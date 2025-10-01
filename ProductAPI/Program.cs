@@ -26,7 +26,6 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
     c.IncludeXmlComments(xmlPath);
-    c.OperationFilter<JsonPatchDocumentOperationFilter>();
     c.ExampleFilters();
 });
 // Add DbContext
@@ -43,6 +42,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.CreateMap<ProductCreateDto, Product>();
     cfg.CreateMap<Product, ProductResponseDto>();
     cfg.CreateMap<ProductUpdateDto, Product>().ReverseMap();
+    cfg.CreateMap<ProductPatchDto, Product>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
 });
 
