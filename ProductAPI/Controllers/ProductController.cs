@@ -96,31 +96,24 @@ namespace ProductAPI.Controllers
         /// Partially updates a product.
         /// </summary>
         /// <param name="id">The Id of the product to update.</param>
-        /// <param name="patchDoc">The updated Product object.</param>
+        /// <param name="patchDto">The updated Product object.</param>
         /// <returns>No content if successful.</returns>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerRequestExample(typeof(JsonPatchDocument<ProductUpdateDto>), typeof(ProductPatchDtoExample))]
-        public async Task<ActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<ProductUpdateDto> patchDoc)
+        [SwaggerRequestExample(typeof(ProductPatchDto), typeof(ProductPatchDtoExample))]
+        public async Task<ActionResult> Patch(Guid id, [FromBody] ProductPatchDto patchDto)
         {
-            // 1. Get the original data as a DTO
-            var productToUpdate = await _productService.GetProductForUpdateAsync(id);
-
-            // 2. Apply the patch to the DTO (without ModelState)
-            patchDoc.ApplyTo(productToUpdate);
-
-            // 3. Manually re-validate the DTO after the patch is applied
-            if (!TryValidateModel(productToUpdate))
+            if (!ModelState.IsValid)
             {
                 return ValidationProblem(ModelState);
             }
-
-            // 4. Send the fully updated DTO to the service to save
-            await _productService.UpdateProductAsync(id, productToUpdate);
+            await _productService.PatchProductAsync(id, patchDto);
             return NoContent();
         }
+
+
 
         /// <summary>
         /// Deletes a product.

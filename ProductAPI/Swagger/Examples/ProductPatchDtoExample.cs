@@ -5,21 +5,20 @@ using Swashbuckle.AspNetCore.Filters;
 namespace ProductAPI.Swagger.Examples
 {
     /// <summary>
-    /// Example of what is sent when updating a product.
+    /// Example of what is sent when partially updating a product.
     /// </summary>
-    public class ProductPatchDtoExample : IExamplesProvider<JsonPatchDocument<ProductUpdateDto>>
+    public class ProductPatchDtoExample : IExamplesProvider<ProductPatchDto>
     {
         /// <summary>
-        /// Example definition of object sent for product patch.
+        /// Example definition of object sent for partial update.
         /// </summary>
-        public JsonPatchDocument<ProductUpdateDto> GetExamples()
+        public ProductPatchDto GetExamples()
         {
-            var patchDoc = new JsonPatchDocument<ProductUpdateDto>();
-
-            patchDoc.Replace(dto => dto.Name, "New Deskotp PC 2026");
-            patchDoc.Replace(dto => dto.Price, 5999.99m);
-
-            return patchDoc;
+            return new ProductPatchDto
+            {
+                Name = "New Desktop PC 2026",
+                Price = 5999.99m
+            };
         }
     }
 }
