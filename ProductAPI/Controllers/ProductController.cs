@@ -103,29 +103,22 @@ namespace ProductAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerRequestExample(typeof(JsonPatchDocument<ProductUpdateDto>), typeof(ProductPatchDtoExample))]
-        public async Task<ActionResult> Patch(Guid id, JsonPatchDocument<ProductUpdateDto> patchDoc)
+        public async Task<ActionResult> Patch(Guid id, [FromBody] JsonPatchDocument<ProductUpdateDto> patchDoc)
         {
             // 1. Get the original data as a DTO
-            var productToUpdate = await _productService.GetProductByIdAsync(id);
-
-            var productDto = new ProductUpdateDto
-            {
-                Name = productToUpdate.Name,
-                Description = productToUpdate.Description,
-                Price = productToUpdate.Price
-            };
+            var productToUpdate = await _productService.GetProductForUpdateAsync(id);
 
             // 2. Apply the patch to the DTO (without ModelState)
-            patchDoc.ApplyTo(productDto);
+            patchDoc.ApplyTo(productToUpdate);
 
             // 3. Manually re-validate the DTO after the patch is applied
-            if (!TryValidateModel(productDto))
+            if (!TryValidateModel(productToUpdate))
             {
                 return ValidationProblem(ModelState);
             }
 
             // 4. Send the fully updated DTO to the service to save
-            await _productService.UpdateProductAsync(id, productDto);
+            await _productService.UpdateProductAsync(id, productToUpdate);
             return NoContent();
         }
 
