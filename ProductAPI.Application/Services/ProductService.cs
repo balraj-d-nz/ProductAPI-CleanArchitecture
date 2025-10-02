@@ -32,7 +32,7 @@ namespace ProductAPI.Application.Services
 
         public async Task DeleteProductAsync(Guid id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
                 throw new NotFoundException(id);
