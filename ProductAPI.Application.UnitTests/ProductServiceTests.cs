@@ -197,14 +197,35 @@ namespace ProductAPI.Application.UnitTests
             _mockContext.Verify(v => v.SaveChangesAsync(default), Times.Once);
         }
 
+        //[Fact]
+        //public async Task DeleteProductAsync_Success()
+        //{
+        //    var mockProductId = Guid.NewGuid();
+        //    var mockProduct = new Product { Id = mockProductId, Name = "Original Test Product", Description = "Original Test Description", Price = 29.99M };
+
+        //    List<Product> mockProductsList = new List<Product> { mockProduct };
+        //    _mockContext.Setup(c => c.Products).ReturnsDbSet(mockProductsList);
+
+        //    await _productService.DeleteProductAsync(mockProductId);
+
+        //    _mockContext.Verify(v => v.Products.Remove(mockProduct), Times.Once);
+        //    _mockContext.Verify(v => v.SaveChangesAsync(default), Times.Once);
+        //}
+
         [Fact]
         public async Task DeleteProductAsync_Success()
         {
             var mockProductId = Guid.NewGuid();
             var mockProduct = new Product { Id = mockProductId, Name = "Original Test Product", Description = "Original Test Description", Price = 29.99M };
 
-            List<Product> mockProductsList = new List<Product> { mockProduct };
-            _mockContext.Setup(c => c.Products).ReturnsDbSet(mockProductsList);
+            // 1. Create a mock of the DbSet. This will allow setup of FindAsync().
+            var mockProductSet = new Mock<DbSet<Product>>();
+
+            // 2. Set up FindAsync on the mock DbSet to return your fake product
+            mockProductSet.Setup(m => m.FindAsync(mockProductId)).ReturnsAsync(mockProduct);
+
+            // 3. Set up the DbContext's Products property to return your mocked DbSet
+            _mockContext.Setup(c => c.Products).Returns(mockProductSet.Object);
 
             await _productService.DeleteProductAsync(mockProductId);
 
@@ -217,8 +238,16 @@ namespace ProductAPI.Application.UnitTests
         {
             var mockProductId = Guid.NewGuid();
 
-            List<Product> mockProductsList = new List<Product>();
-            _mockContext.Setup(c => c.Products).ReturnsDbSet(mockProductsList);
+            // 1. Create a mock of the DbSet. This will allow setup of FindAsync().
+            var mockProductSet = new Mock<DbSet<Product>>();
+
+            // 2. Set up FindAsync on the mock DbSet to return your fake product
+            mockProductSet.Setup(m => m.FindAsync(It.IsAny<object[]>()))
+           .ReturnsAsync((Product?)null);
+
+            // 3. Set up the DbContext's Products property to return your mocked DbSet
+            _mockContext.Setup(c => c.Products).Returns(mockProductSet.Object);
+
             await Assert.ThrowsAsync<NotFoundException>(() => _productService.DeleteProductAsync(mockProductId));
         }
     }
