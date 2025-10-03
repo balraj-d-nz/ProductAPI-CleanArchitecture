@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ProductAPI.Application.Common.Mappings;
 using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
@@ -39,13 +40,8 @@ if (builder.Environment.IsEnvironment("Testing") == false)
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<DatabaseContext>());
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.CreateMap<ProductCreateDto, Product>();
-    cfg.CreateMap<Product, ProductResponseDto>();
-    cfg.CreateMap<ProductUpdateDto, Product>().ReverseMap();
-    cfg.CreateMap<ProductPatchDto, Product>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
+builder.Services.AddAutoMapper(config => {
+    config.AddProfile<MappingProfile>();
 });
 
 var app = builder.Build();
