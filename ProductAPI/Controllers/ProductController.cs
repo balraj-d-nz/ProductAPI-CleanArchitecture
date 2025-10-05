@@ -120,7 +120,7 @@ namespace ProductAPI.Controllers
         /// </summary>
         /// <param name="id">The Id of the product to delete.</param>
         /// <returns>No content if successful.</returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

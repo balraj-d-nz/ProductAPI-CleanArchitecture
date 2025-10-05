@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ProductAPI.Application.Common.Mappings;
 using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
@@ -30,38 +31,38 @@ builder.Services.AddSwaggerGen(c =>
 });
 // Add DbContext
 builder.Services.AddScoped<IProductService, ProductService>();
-
-builder.Services.AddDbContext<DatabaseContext>(options =>
+if (builder.Environment.IsEnvironment("Testing") == false)
+{
+    builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
+}
 
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
     provider.GetRequiredService<DatabaseContext>());
 
-builder.Services.AddAutoMapper(cfg =>
-{
-    cfg.CreateMap<ProductCreateDto, Product>();
-    cfg.CreateMap<Product, ProductResponseDto>();
-    cfg.CreateMap<ProductUpdateDto, Product>().ReverseMap();
-    cfg.CreateMap<ProductPatchDto, Product>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-
+builder.Services.AddAutoMapper(config => {
+    config.AddProfile<MappingProfile>();
 });
 
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
-using (var scope = app.Services.CreateScope())
+if (builder.Environment.IsEnvironment("Testing") == false)
 {
-    var services = scope.ServiceProvider;
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        var context = services.GetRequiredService<DatabaseContext>();
-        await DatabaseSeeder.SeedDatabaseAsync(context);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred during database seeding.");
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<DatabaseContext>();
+            await DatabaseSeeder.SeedDatabaseAsync(context);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred during database seeding.");
+        }
     }
 }
 
@@ -79,3 +80,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { } // Add this line at the bottom of the file to allow IntegrationTests Project to access Program.cs.

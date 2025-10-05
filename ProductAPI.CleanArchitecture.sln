@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Infrastructure",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.Application.UnitTests", "ProductAPI.Application.UnitTests\ProductAPI.Application.UnitTests.csproj", "{EA5334C6-1583-4BC2-895E-FF1BF59943B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductAPI.IntegrationTests", "ProductAPI.IntegrationTests\ProductAPI.IntegrationTests.csproj", "{0F418B86-9404-49EF-B72D-0048F8C179A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{EA5334C6-1583-4BC2-895E-FF1BF59943B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA5334C6-1583-4BC2-895E-FF1BF59943B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA5334C6-1583-4BC2-895E-FF1BF59943B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F418B86-9404-49EF-B72D-0048F8C179A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F418B86-9404-49EF-B72D-0048F8C179A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F418B86-9404-49EF-B72D-0048F8C179A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F418B86-9404-49EF-B72D-0048F8C179A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
