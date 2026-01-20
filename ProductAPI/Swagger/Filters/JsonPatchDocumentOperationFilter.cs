@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.OpenApi.Models;
+﻿using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ProductAPI.Swagger.Filters
@@ -25,32 +26,69 @@ namespace ProductAPI.Swagger.Filters
 
             operation.RequestBody = new OpenApiRequestBody
             {
-                Content =
-            {
-                ["application/json-patch+json"] = new OpenApiMediaType
+                Content = new Dictionary<string, OpenApiMediaType>
+                {
+                    ["application/json-patch+json"] = new OpenApiMediaType
                 {
                     Schema = new OpenApiSchema
                     {
-                        Type = "array",
+                        Type = JsonSchemaType.Array,
                         Items = new OpenApiSchema
                         {
-                            Type = "object",
+                            Type = JsonSchemaType.Object,
                             Required = new HashSet<string> { "op", "path" },
-                            Properties = new Dictionary<string, OpenApiSchema>
+                            Properties = new Dictionary<string, IOpenApiSchema>
                             {
-                                { "op", new OpenApiSchema { Type = "string", Description = "The operation to perform.", Enum = new List<Microsoft.OpenApi.Any.IOpenApiAny> { new Microsoft.OpenApi.Any.OpenApiString("add"), new Microsoft.OpenApi.Any.OpenApiString("remove"), new Microsoft.OpenApi.Any.OpenApiString("replace"), new Microsoft.OpenApi.Any.OpenApiString("move"), new Microsoft.OpenApi.Any.OpenApiString("copy"), new Microsoft.OpenApi.Any.OpenApiString("test") } } },
-                                { "path", new OpenApiSchema { Type = "string", Description = "The JSON Pointer path to the target location." } },
-                                { "from", new OpenApiSchema { Type = "string", Description = "A JSON Pointer path to the source location for 'move' or 'copy' operations." } },
-                                { "value", new OpenApiSchema { Type = "any", Description = "The value to be used for 'add', 'replace', or 'test' operations." } }
+                                { 
+                                    "op", 
+                                    new OpenApiSchema 
+                                    { 
+                                        Type = JsonSchemaType.String, 
+                                        Description = "The operation to perform.", 
+                                        Enum = new List<JsonNode> 
+                                        { 
+                                            JsonValue.Create("add")!, 
+                                            JsonValue.Create("remove")!, 
+                                            JsonValue.Create("replace")!, 
+                                            JsonValue.Create("move")!, 
+                                            JsonValue.Create("copy")!, 
+                                            JsonValue.Create("test")! 
+                                        } 
+                                    } 
+                                },
+                                { 
+                                    "path", 
+                                    new OpenApiSchema 
+                                    { 
+                                        Type = JsonSchemaType.String, 
+                                        Description = "The JSON Pointer path to the target location." 
+                                    } 
+                                },
+                                { 
+                                    "from", 
+                                    new OpenApiSchema 
+                                    { 
+                                        Type = JsonSchemaType.String, 
+                                        Description = "A JSON Pointer path to the source location for 'move' or 'copy' operations." 
+                                    } 
+                                },
+                                { 
+                                    "value", 
+                                    new OpenApiSchema 
+                                    { 
+                                        Description = "The value to be used for 'add', 'replace', or 'test' operations." 
+                                        // Type is intentionally not specified to allow any type
+                                    } 
+                                }
                             }
                         },
-                        Example = new Microsoft.OpenApi.Any.OpenApiArray
+                        Example = new JsonArray
                         {
-                            new Microsoft.OpenApi.Any.OpenApiObject
+                            new JsonObject
                             {
-                                ["op"] = new Microsoft.OpenApi.Any.OpenApiString("replace"),
-                                ["path"] = new Microsoft.OpenApi.Any.OpenApiString("/name"),
-                                ["value"] = new Microsoft.OpenApi.Any.OpenApiString("New Product Name")
+                                ["op"] = "replace",
+                                ["path"] = "/name",
+                                ["value"] = "New Product Name"
                             }
                         }
                     }

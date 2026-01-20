@@ -253,7 +253,6 @@ namespace ProductAPI.IntegrationTests
         public async Task PatchProductAsync_NotFoundException()
         {
             var productId = Guid.NewGuid();
-            var productPrice = 9.99M;
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
             var productUpdateDto = new ProductPatchDto();
             var response = await client.PatchAsJsonAsync($"api/Product/{productId}", productUpdateDto);
