@@ -4,12 +4,14 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi;
 using ProductAPI.Application.Common.Mappings;
 using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
 using ProductAPI.Domain.Entities;
 using ProductAPI.Infrastructure.Persistence;
+using ProductAPI.Middleware;
 using ProductAPI.Swagger.Filters;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -69,7 +71,10 @@ if (builder.Environment.IsEnvironment("Testing") == false)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(options =>
+    {
+        options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+    });
     app.UseSwaggerUI();
 }
 
