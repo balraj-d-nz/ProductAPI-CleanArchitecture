@@ -24,4 +24,8 @@
 		<ProjectReference Include="..\ProductAPI.Infrastucture\ProductAPI.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
+	</ItemGroup>
+
 </Project>
