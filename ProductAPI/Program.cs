@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ using ProductAPI.Application.DTOs;
 using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
 using ProductAPI.Domain.Entities;
+using ProductAPI.Extensions;
 using ProductAPI.Infrastructure.Persistence;
 using ProductAPI.Middleware;
 using ProductAPI.Swagger.Filters;
@@ -20,17 +22,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
-builder.Services.AddSwaggerGen(c =>
-{
-    // Locate the XML file created by <GenerateDocumentationFile>
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-    c.IncludeXmlComments(xmlPath);
-    c.ExampleFilters();
-});
+builder.Services.AddAuth0Authentication(builder.Configuration); //Configures JWT Auth
+builder.Services.AddSwaggerWithAuth0(builder.Configuration); //Configures Swagger
+
 // Add DbContext
 builder.Services.AddScoped<IProductService, ProductService>();
 if (builder.Environment.IsEnvironment("Testing") == false)
@@ -75,11 +74,17 @@ if (app.Environment.IsDevelopment())
     {
         options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
     });
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
+        c.OAuthClientId(builder.Configuration["Auth0:ClientId"]); // Add this to appsettings
+        c.OAuthUsePkce();
+    });
 }
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Net;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,7 @@ namespace ProductAPI.Controllers
         /// </summary>
         /// <returns>A list of products if any exist.</returns>
         [HttpGet]
+        [Authorize(Policy = "ReadProduct")]
         [ProducesResponseType(typeof(List<ProductResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(ProductResponseDtoExample))]
