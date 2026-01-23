@@ -12,6 +12,7 @@ using ProductAPI.Application.Interfaces;
 using ProductAPI.Application.Services;
 using ProductAPI.Domain.Entities;
 using ProductAPI.Extensions;
+using ProductAPI.Infrastructure.Authentication;
 using ProductAPI.Infrastructure.Persistence;
 using ProductAPI.Middleware;
 using ProductAPI.Swagger.Filters;
@@ -30,8 +31,11 @@ builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 builder.Services.AddAuth0Authentication(builder.Configuration); //Configures JWT Auth
 builder.Services.AddSwaggerWithAuth0(builder.Configuration); //Configures Swagger
 
-// Add DbContext
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// Add DbContext
 if (builder.Environment.IsEnvironment("Testing") == false)
 {
     builder.Services.AddDbContext<DatabaseContext>(options =>
