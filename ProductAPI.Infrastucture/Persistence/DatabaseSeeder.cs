@@ -23,11 +23,11 @@ namespace ProductAPI.Infrastructure.Persistence
 
             var products = new List<Product>
         {
-            new Product { Name = "Laptop", Price = 1999.99M, Description = "High performance laptop", CreatedDate = DateTime.Now },
-            new Product { Name = "Smartphone", Price = 899.50M, Description = "Latest model smartphone", CreatedDate = DateTime.Now },
-            new Product { Name = "Headphones", Price = 149.95M, Description = "Noise-cancelling headphones", CreatedDate = DateTime.Now },
-            new Product { Name = "Keyboard", Price = 79.99M, Description = "Mechanical keyboard", CreatedDate = DateTime.Now },
-            new Product { Name = "Monitor", Price = 499.00M, Description = "27-inch 4K monitor", CreatedDate = DateTime.Now }
+            new Product { Name = "Laptop", Price = 1999.99M, Description = "High performance laptop" },
+            new Product { Name = "Smartphone", Price = 899.50M, Description = "Latest model smartphone" },
+            new Product { Name = "Headphones", Price = 149.95M, Description = "Noise-cancelling headphones" },
+            new Product { Name = "Keyboard", Price = 79.99M, Description = "Mechanical keyboard"},
+            new Product { Name = "Monitor", Price = 499.00M, Description = "27-inch 4K monitor" }
         };
 
             await context.Products.AddRangeAsync(products);

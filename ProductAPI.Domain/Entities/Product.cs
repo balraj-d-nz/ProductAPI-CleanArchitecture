@@ -2,10 +2,13 @@
 {
     public class Product
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.CreateVersion7();
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; } = string.Empty;
+        public string? ModifiedBy { get; set; }
+        public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
+        public DateTime? ModifiedOnUtc { get; set; }
     }
 }

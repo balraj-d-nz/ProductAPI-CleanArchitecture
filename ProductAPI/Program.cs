@@ -14,6 +14,7 @@ using ProductAPI.Domain.Entities;
 using ProductAPI.Extensions;
 using ProductAPI.Infrastructure.Authentication;
 using ProductAPI.Infrastructure.Persistence;
+using ProductAPI.Infrastructure.Persistence.Interceptors;
 using ProductAPI.Middleware;
 using ProductAPI.Swagger.Filters;
 using Swashbuckle.AspNetCore.Filters;
@@ -34,12 +35,16 @@ builder.Services.AddSwaggerWithAuth0(builder.Configuration); //Configures Swagge
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-// Add DbContext
+//Register the Interceptor for when a Product Is added or modified, will update CreatedBy, CreatedDateUtc, ModifiedBy, ModifiedDateUtc
+builder.Services.AddScoped<AuditableEntityInterceptor>();
+// Add DbContextß
 if (builder.Environment.IsEnvironment("Testing") == false)
 {
-    builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString")));
+    builder.Services.AddDbContext<DatabaseContext>((sp, options) =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnectionString"));
+        options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
+    });
 }
 
 builder.Services.AddScoped<IApplicationDbContext>(provider =>
