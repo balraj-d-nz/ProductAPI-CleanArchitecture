@@ -8,7 +8,7 @@
         public decimal Price { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
         public string? ModifiedBy { get; set; }
-        public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
-        public DateTime? ModifiedOnUtc { get; set; }
+        public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime? ModifiedAtUtc { get; set; }
     }
 }

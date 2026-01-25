@@ -33,7 +33,7 @@ namespace ProductAPI.Application.UnitTests
             var mockProduct = new Product
             {
                 Id = mockProductId, Name = "Test Product", Description = "Test Description", Price = 9.99M,
-                CreatedOnUtc = DateTime.UtcNow
+                CreatedAtUtc = DateTime.UtcNow
             };
             var mockProductDto = new ProductResponseDto
                 { Id = mockProductId, Name = "Test Product", Description = "Test Description", Price = 9.99m };
@@ -87,7 +87,7 @@ namespace ProductAPI.Application.UnitTests
             var mockProduct = new Product
             {
                 Id = mockProductId, Name = mockProductCreateDto.Name, Description = mockProductCreateDto.Description,
-                Price = mockProductCreateDto.Price, CreatedOnUtc = DateTime.UtcNow
+                Price = mockProductCreateDto.Price, CreatedAtUtc = DateTime.UtcNow
             };
             var mockProductResponseDto = new ProductResponseDto
             {

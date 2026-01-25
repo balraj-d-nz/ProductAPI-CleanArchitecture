@@ -34,7 +34,7 @@ namespace ProductAPI.IntegrationTests
                 var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                 await context.Database.EnsureDeletedAsync(); // Ensure the DB is empty
                 // Add a product to the in-memory database
-                await context.Products.AddAsync(new Product { Id = productId, Name = "Test Product", Description = "Test Description", Price = 100, CreatedOnUtc = DateTime.UtcNow });
+                await context.Products.AddAsync(new Product { Id = productId, Name = "Test Product", Description = "Test Description", Price = 100, CreatedAtUtc = DateTime.UtcNow });
                 await context.SaveChangesAsync();
             }
 
@@ -68,7 +68,7 @@ namespace ProductAPI.IntegrationTests
 
                 for (int i = 1; i <= createProductObjectAmount; i++)
                 {
-                    await context.Products.AddAsync(new Product { Id = Guid.CreateVersion7(), Name = $"Test Product{i}", Description = $"Test Description{i}", Price = i * createProductObjectAmount, CreatedOnUtc = DateTime.UtcNow });
+                    await context.Products.AddAsync(new Product { Id = Guid.CreateVersion7(), Name = $"Test Product{i}", Description = $"Test Description{i}", Price = i * createProductObjectAmount, CreatedAtUtc = DateTime.UtcNow });
                 }
                 await context.SaveChangesAsync();
             }
@@ -127,7 +127,7 @@ namespace ProductAPI.IntegrationTests
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedOnUtc = DateTime.UtcNow };
+            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {
@@ -164,7 +164,7 @@ namespace ProductAPI.IntegrationTests
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedOnUtc = DateTime.UtcNow };
+            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {
@@ -201,7 +201,7 @@ namespace ProductAPI.IntegrationTests
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToDelete = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedOnUtc = DateTime.UtcNow };
+            var productToDelete = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {

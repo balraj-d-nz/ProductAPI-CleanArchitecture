@@ -31,13 +31,13 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedBy = userId;
-                entry.Entity.CreatedOnUtc = DateTime.UtcNow;
+                entry.Entity.CreatedAtUtc = DateTime.UtcNow;
             }
 
             if (entry.State == EntityState.Modified)
             {
                 entry.Entity.ModifiedBy = userId;
-                entry.Entity.ModifiedOnUtc = DateTime.UtcNow;
+                entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
             }
         }
 
