@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices.JavaScript;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProductAPI.Application.DTOs
@@ -13,5 +14,8 @@ namespace ProductAPI.Application.DTOs
         [Required]
         [Precision(7,2)]
         public decimal Price { get; set; }
+
+        public string CreatedBy { get; set; } = string.Empty;
+        public string? ModifiedBy { get; set; } = string.Empty;
     }
 }

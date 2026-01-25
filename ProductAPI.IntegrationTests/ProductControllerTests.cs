@@ -25,7 +25,7 @@ namespace ProductAPI.IntegrationTests
         public async Task GetProductByIdAsync_WithExistingId_ReturnsOkAndProduct()
         {
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
 
             // We need to access the database directly to seed data
             // We create a scope to get the DbContext instance
@@ -34,7 +34,7 @@ namespace ProductAPI.IntegrationTests
                 var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
                 await context.Database.EnsureDeletedAsync(); // Ensure the DB is empty
                 // Add a product to the in-memory database
-                await context.Products.AddAsync(new Product { Id = productId, Name = "Test Product", Description = "Test Description", Price = 100, CreatedDate = DateTime.UtcNow });
+                await context.Products.AddAsync(new Product { Id = productId, Name = "Test Product", Description = "Test Description", Price = 100, CreatedAtUtc = DateTime.UtcNow });
                 await context.SaveChangesAsync();
             }
 
@@ -68,7 +68,7 @@ namespace ProductAPI.IntegrationTests
 
                 for (int i = 1; i <= createProductObjectAmount; i++)
                 {
-                    await context.Products.AddAsync(new Product { Id = Guid.NewGuid(), Name = $"Test Product{i}", Description = $"Test Description{i}", Price = i * createProductObjectAmount, CreatedDate = DateTime.UtcNow });
+                    await context.Products.AddAsync(new Product { Id = Guid.CreateVersion7(), Name = $"Test Product{i}", Description = $"Test Description{i}", Price = i * createProductObjectAmount, CreatedAtUtc = DateTime.UtcNow });
                 }
                 await context.SaveChangesAsync();
             }
@@ -121,13 +121,13 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task UpdateProductAsync_ReturnsNoContent()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var productName = "Create Product 1";
             var productDescription = "Create Product 1";
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedDate = DateTime.UtcNow };
+            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {
@@ -158,13 +158,13 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task PatchProductAsync_ReturnsNoContent()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var productName = "Create Product 1";
             var productDescription = "Create Product 1";
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedDate = DateTime.UtcNow };
+            var productToPatch = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {
@@ -195,13 +195,13 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task DeleteProductAsync_ReturnsNoContent()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var productName = "Create Product 1";
             var productDescription = "Create Product 1";
             var productPrice = 99.99M;
 
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
-            var productToDelete = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedDate = DateTime.UtcNow };
+            var productToDelete = new Product { Id = productId, Name = productName, Description = productDescription, Price = productPrice, CreatedAtUtc = DateTime.UtcNow };
 
             using (var scope = _factory.Services.CreateScope())
             {
@@ -228,7 +228,7 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task GetProductByIdAsync_NotFoundException()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
             var response = await client.GetAsync($"api/Product/{productId}");
 
@@ -238,7 +238,7 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task UpdateProductAsync_NotFoundException()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var productName = "Update Product 1";
             var productDescription = "Create Product 1";
             var productPrice = 99.99M;
@@ -252,7 +252,7 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task PatchProductAsync_NotFoundException()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
             var productUpdateDto = new ProductPatchDto();
             var response = await client.PatchAsJsonAsync($"api/Product/{productId}", productUpdateDto);
@@ -263,7 +263,7 @@ namespace ProductAPI.IntegrationTests
         [Fact]
         public async Task DeleteProductAsync_NotFoundException()
         {
-            var productId = Guid.NewGuid();
+            var productId = Guid.CreateVersion7();
             var client = _factory.CreateClient(); // Creates an HttpClient that can talk to our test server
             var response = await client.DeleteAsync($"api/Product/{productId}");
 
