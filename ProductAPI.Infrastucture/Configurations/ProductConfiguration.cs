@@ -13,6 +13,8 @@ namespace ProductAPI.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
+            builder.ToTable("Products");
+            
             //Defines the Primary Key
             builder.HasKey(p => p.Id);
 
@@ -30,6 +32,21 @@ namespace ProductAPI.Infrastructure.Configurations
             builder.Property(p => p.Price)
                 .IsRequired()
                 .HasPrecision(7, 2);
+            
+            // Relationships
+            builder.HasOne(p => p.CreatedBy)
+                .WithMany(u => u.CreatedProducts)
+                .HasForeignKey(p => p.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        
+            builder.HasOne(p => p.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(p => p.ModifiedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        
+            // Indexes
+            builder.HasIndex(p => p.CreatedById);
+            builder.HasIndex(p => p.CreatedAtUtc);
 
         }
     }
