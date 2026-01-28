@@ -22,24 +22,54 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     {
         var context = eventData.Context;
         if (context == null) return base.SavingChangesAsync(eventData, result, cancellationToken);
-
+        
         // Get the current user ID (or "ProductAPI-System" if null)
-        var userId = _currentUserService.UserId ?? "ProductAPI-System";
+        var userId = _currentUserService.UserId ?? "ProductApi-System";
+        var entries = context.ChangeTracker.Entries().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-        foreach (var entry in context.ChangeTracker.Entries<Product>()) 
+        foreach (var entry in entries)
         {
-            if (entry.State == EntityState.Added)
+            if (entry.Entity is User user)
             {
-                entry.Entity.CreatedById = userId;
-                entry.Entity.CreatedAtUtc = DateTime.UtcNow;
+                if (entry.State == EntityState.Added)
+                {
+                    user.CreatedAtUtc = DateTime.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    user.UpdatedAtUtc = DateTime.UtcNow;
+                }
             }
 
-            if (entry.State == EntityState.Modified)
+            if (entry.Entity is Product product)
             {
-                entry.Entity.ModifiedById = userId;
-                entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
+                if (entry.State == EntityState.Added)
+                {
+                    product.CreatedAtUtc = DateTime.UtcNow;
+                    product.CreatedById = userId;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    product.ModifiedAtUtc = DateTime.UtcNow;
+                    product.ModifiedById = userId;
+                }
             }
         }
+        
+        // foreach (var entry in context.ChangeTracker.Entries<Product>()) 
+        // {
+        //     if (entry.State == EntityState.Added)
+        //     {
+        //         entry.Entity.CreatedById = userId;
+        //         entry.Entity.CreatedAtUtc = DateTime.UtcNow;
+        //     }
+        //
+        //     if (entry.State == EntityState.Modified)
+        //     {
+        //         entry.Entity.ModifiedById = userId;
+        //         entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
+        //     }
+        // }
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
