@@ -24,4 +24,8 @@
 		<ProjectReference Include="..\ProductAPI.Infrastucture\ProductAPI.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Include="wwwroot\content\swagger-extras.css" />
+	</ItemGroup>
+
 </Project>
