@@ -19,7 +19,8 @@ public class UserSyncMiddleware
         {
             var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userEmail = context.User.FindFirstValue(ClaimTypes.Email);
-            var userName = context.User.FindFirstValue(ClaimTypes.Name);
+            var name = context.User.FindFirst("name")?.Value;
+            
             if (!string.IsNullOrEmpty(userId))
             {
                 var user = await dbContext.Users.FindAsync(userId);
@@ -28,8 +29,8 @@ public class UserSyncMiddleware
                     await dbContext.Users.AddAsync(new User
                     {
                         Id = userId,
-                        Email = userEmail ?? null,
-                        Name = userName ?? null,
+                        Email = userEmail ?? "",
+                        Name = name ?? "",
                         LastLoginAt = DateTime.UtcNow,
                         IsActive = true
                     });
@@ -45,9 +46,9 @@ public class UserSyncMiddleware
                         updateUser = true;
                     }
                     
-                    if (user.Name != userName && !string.IsNullOrEmpty(userName))
+                    if (user.Name != name && !string.IsNullOrEmpty(name))
                     {
-                        user.Name = userName;
+                        user.Name = name;
                         updateUser = true;
                     }
                     

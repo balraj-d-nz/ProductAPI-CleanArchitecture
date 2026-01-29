@@ -90,6 +90,7 @@ if (app.Environment.IsDevelopment())
         c.OAuthClientId(builder.Configuration["Auth0:ClientId"]); // Add this to appsettings.
         c.InjectStylesheet("/content/swagger-extras.css"); //Hides ClientId,ClientSecret Fields and Scopes checkboxes as not need to select.   
         c.OAuthUsePkce();
+        c.OAuthScopes("openid", "profile", "email"); // Pre-select these scopes
     });
 }
 

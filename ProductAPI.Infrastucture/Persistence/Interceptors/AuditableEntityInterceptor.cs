@@ -55,22 +55,6 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
                 }
             }
         }
-        
-        // foreach (var entry in context.ChangeTracker.Entries<Product>()) 
-        // {
-        //     if (entry.State == EntityState.Added)
-        //     {
-        //         entry.Entity.CreatedById = userId;
-        //         entry.Entity.CreatedAtUtc = DateTime.UtcNow;
-        //     }
-        //
-        //     if (entry.State == EntityState.Modified)
-        //     {
-        //         entry.Entity.ModifiedById = userId;
-        //         entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
-        //     }
-        // }
-
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }
