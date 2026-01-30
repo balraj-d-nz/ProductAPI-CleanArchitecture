@@ -79,6 +79,7 @@ if (builder.Environment.IsEnvironment("Testing") == false)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseStaticFiles();
     app.UseSwagger(options =>
     {
         options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
@@ -86,14 +87,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
-        c.OAuthClientId(builder.Configuration["Auth0:ClientId"]); // Add this to appsettings
+        c.OAuthClientId(builder.Configuration["Auth0:ClientId"]); // Add this to appsettings.
+        c.InjectStylesheet("/content/swagger-extras.css"); //Hides ClientId,ClientSecret Fields and Scopes checkboxes as not need to select.   
         c.OAuthUsePkce();
+        c.OAuthScopes("openid", "profile", "email"); // Pre-select these scopes
     });
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseUserSync();
 app.UseAuthorization();
 
 app.MapControllers();

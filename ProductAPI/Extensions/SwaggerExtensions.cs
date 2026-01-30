@@ -43,6 +43,8 @@ public static class SwaggerExtensions
                         Scopes = new Dictionary<string, string>
                         {
                             { "openid", "OpenID" },
+                            { "profile", "Profile" },
+                            { "email", "Email" }
                         }
                     }
                 }
@@ -51,7 +53,7 @@ public static class SwaggerExtensions
             // Add the Security Requirement
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
             {
-                [new OpenApiSecuritySchemeReference("oauth2", document)] = new List<string> { "openid" }
+                [new OpenApiSecuritySchemeReference("oauth2", document)] = new List<string> { "openid", "profile", "email" }
             });
             // Locate the XML file created by <GenerateDocumentationFile>
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
