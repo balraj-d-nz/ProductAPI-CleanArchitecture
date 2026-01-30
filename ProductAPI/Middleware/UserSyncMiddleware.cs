@@ -57,7 +57,7 @@ public class UserSyncMiddleware
                     
                     if (updateUser)
                     {
-                        user.UpdatedAtUtc = DateTime.UtcNow;
+                        user.ModifiedAtUtc = DateTime.UtcNow;
                         await dbContext.SaveChangesAsync();
                     }
                 }

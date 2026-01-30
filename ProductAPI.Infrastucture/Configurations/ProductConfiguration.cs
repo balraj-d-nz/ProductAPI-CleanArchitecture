@@ -17,6 +17,9 @@ namespace ProductAPI.Infrastructure.Configurations
             
             //Defines the Primary Key
             builder.HasKey(p => p.Id);
+            
+            builder.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
 
             //Configure Name Property Required and Max Length
             builder.Property(p => p.Name)

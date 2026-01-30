@@ -29,6 +29,24 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 
         foreach (var entry in entries)
         {
+            if (entry.Entity is Product product)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    if (product.Id == Guid.Empty)
+                    {
+                        product.Id = Guid.CreateVersion7();  // ← Modern, sortable GUIDs
+                    }
+                    product.CreatedAtUtc = DateTime.UtcNow;
+                    product.CreatedById = userId;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    product.ModifiedAtUtc = DateTime.UtcNow;
+                    product.ModifiedById = userId;
+                }
+            }
+            
             if (entry.Entity is User user)
             {
                 if (entry.State == EntityState.Added)
@@ -37,21 +55,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
                 }
                 else if (entry.State == EntityState.Modified)
                 {
-                    user.UpdatedAtUtc = DateTime.UtcNow;
-                }
-            }
-
-            if (entry.Entity is Product product)
-            {
-                if (entry.State == EntityState.Added)
-                {
-                    product.CreatedAtUtc = DateTime.UtcNow;
-                    product.CreatedById = userId;
-                }
-                else if (entry.State == EntityState.Modified)
-                {
-                    product.ModifiedAtUtc = DateTime.UtcNow;
-                    product.ModifiedById = userId;
+                    user.ModifiedAtUtc = DateTime.UtcNow;
                 }
             }
         }
